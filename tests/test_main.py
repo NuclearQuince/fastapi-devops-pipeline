@@ -22,6 +22,7 @@ def test_get_item():
     assert response.status_code == 200
     assert response.json() == {'item_id': 42, 'name': 'Item 42'}
 
+
 def test_health_check_db():
     response = client.get('/health/db')
     assert response.status_code == 200

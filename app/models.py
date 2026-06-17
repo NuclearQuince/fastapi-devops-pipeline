@@ -15,5 +15,5 @@ class RequestLog(Base):
     method = Column(String, index=True)                          # HTTP method, e.g. GET, POST
     path = Column(String, index=True)                             # Endpoint path that was called
     status_code = Column(Integer)                                  # HTTP response status code
-    response_time_ms = Column(Float)                               # How long the request took, in ms
-    timestamp = Column(DateTime(timezone=True), server_default=func.now())  # When the request happened
+    response_time_ms = Column(Float)                               # Request duration in ms
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())   # Created at
