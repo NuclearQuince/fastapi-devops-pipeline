@@ -1,9 +1,11 @@
 import time
+import os
 from fastapi import FastAPI, Request, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from prometheus_fastapi_instrumentator import Instrumentator
-
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from app.database import engine, Base, get_db
 from app.models import RequestLog
 
@@ -11,6 +13,10 @@ from app.models import RequestLog
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+# Mount static files and templates
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 # Expose Prometheus metrics at /metrics
 Instrumentator().instrument(app).expose(app)
@@ -45,8 +51,13 @@ async def log_requests(request: Request, call_next):
 
 
 @app.get('/')
-def read_root():
-    return {'message': 'Hello, Mihir!', 'status': 'healthy'}
+def read_root(request: Request):
+    """Serves the landing page with navigation to all endpoints."""
+    name = os.getenv("APP_OWNER_NAME", "World")
+    return templates.TemplateResponse(
+        name='index.html', request=request,
+        context={'name': name}
+    )
 
 
 @app.get('/health')

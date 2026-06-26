@@ -8,7 +8,8 @@ client = TestClient(app)
 def test_read_root():
     response = client.get('/')
     assert response.status_code == 200
-    assert response.json()['status'] == 'healthy'
+    assert 'text/html' in response.headers['content-type']
+    assert 'Hello' in response.text
 
 
 def test_health_check():
