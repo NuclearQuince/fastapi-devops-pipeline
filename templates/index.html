@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI DevOps Pipeline</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="status-dot"></div>
+            <span class="status-text">Live on Render</span>
+        </header>
+
+        <main>
+            <h1>Hello, {{ name }} 👋</h1>
+            <p class="subtitle">FastAPI DevOps Pipeline — CI/CD, Observability & Cloud Deployment</p>
+
+            <div class="card-grid">
+                <a href="/stats" class="card">
+                    <div class="card-icon">📊</div>
+                    <div class="card-title">Stats</div>
+                    <div class="card-desc">Request logs & endpoint breakdown</div>
+                </a>
+                <a href="/health" class="card">
+                    <div class="card-icon">❤️</div>
+                    <div class="card-title">Health</div>
+                    <div class="card-desc">App & database status</div>
+                </a>
+                <a href="/docs" class="card">
+                    <div class="card-icon">📄</div>
+                    <div class="card-title">API Docs</div>
+                    <div class="card-desc">Interactive Swagger UI</div>
+                </a>
+                <a href="/metrics" class="card">
+                    <div class="card-icon">🔍</div>
+                    <div class="card-title">Metrics</div>
+                    <div class="card-desc">Prometheus metrics endpoint</div>
+                </a>
+            </div>
+
+            <div class="links">
+                <a href="https://github.com/NuclearQuince/fastapi-devops-pipeline" target="_blank">GitHub Repo</a>
+                <span>·</span>
+                <a href="/dashboard" target="_blank">Grafana Dashboard</a>
+            </div>
+        </main>
+
+        <footer>
+            Built with FastAPI · Deployed on Render · Monitored with Grafana
+        </footer>
+    </div>
+</body>
+</html>
