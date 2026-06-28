@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health — FastAPI DevOps Pipeline</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/" class="back-link">← Back</a>
+        </header>
+
+        <main>
+            <h1>System Health</h1>
+            <p class="subtitle">Current status of all system components</p>
+
+            <div class="health-grid">
+                <div class="health-card">
+                    <div class="health-icon">🚀</div>
+                    <div class="health-info">
+                        <div class="health-name">Application</div>
+                        <div class="health-detail">FastAPI · Uvicorn</div>
+                    </div>
+                    <div class="health-badge {{ 'badge-ok' if app_status == 'ok' else 'badge-error' }}">
+                        {{ app_status }}
+                    </div>
+                </div>
+
+                <div class="health-card">
+                    <div class="health-icon">🗄️</div>
+                    <div class="health-info">
+                        <div class="health-name">Database</div>
+                        <div class="health-detail">PostgreSQL · Render</div>
+                    </div>
+                    <div class="health-badge {{ 'badge-ok' if db_status == 'connected' else 'badge-error' }}">
+                        {{ db_status }}
+                    </div>
+                </div>
+
+                <div class="health-card">
+                    <div class="health-icon">📊</div>
+                    <div class="health-info">
+                        <div class="health-name">Metrics</div>
+                        <div class="health-detail">Prometheus · /metrics</div>
+                    </div>
+                    <div class="health-badge badge-ok">exposed</div>
+                </div>
+
+                <div class="health-card">
+                    <div class="health-icon">🔄</div>
+                    <div class="health-info">
+                        <div class="health-name">CI/CD</div>
+                        <div class="health-detail">GitHub Actions · Render</div>
+                    </div>
+                    <div class="health-badge badge-ok">active</div>
+                </div>
+            </div>
+
+            <div class="uptime-info">
+                <span>Total requests logged: <strong>{{ total_requests }}</strong></span>
+            </div>
+        </main>
+
+        <footer>
+            Built with FastAPI · Deployed on Render · Monitored with Grafana
+        </footer>
+    </div>
+</body>
+</html>

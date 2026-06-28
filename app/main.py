@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from app.database import engine, Base, get_db
 from app.models import RequestLog
+from fastapi.responses import RedirectResponse
 
 # Create all tables on startup if they don't already exist.
 Base.metadata.create_all(bind=engine)
@@ -61,44 +62,59 @@ def read_root(request: Request):
 
 
 @app.get('/health')
-def health_check():
-    return {'status': 'ok'}
-
-
-@app.get('/health/db')
-def health_check_db(db: Session = Depends(get_db)):
-    """Checks that the database connection is alive."""
+def health_check(request: Request, db: Session = Depends(get_db)):
+    """Returns HTML health status page for all system components."""
     try:
         db.execute(func.now())
-        return {'status': 'ok', 'database': 'connected'}
-    except Exception as e:
-        return {'status': 'error', 'database': str(e)}
+        db_status = 'connected'
+    except Exception:
+        db_status = 'error'
 
+    total_requests = db.query(RequestLog).count()
 
-@app.get('/items/{item_id}')
-def get_item(item_id: int):
-    return {'item_id': item_id, 'name': f'Item {item_id}'}
+    return templates.TemplateResponse(
+        name='health.html', request=request,
+        context={
+            'app_status': 'ok',
+            'db_status': db_status,
+            'total_requests': total_requests,
+        }
+    )
 
 
 @app.get('/stats')
-def get_stats(db: Session = Depends(get_db)):
-    """
-    Returns aggregate statistics from all logged requests:
-    total count, average response time, and a breakdown by endpoint.
-    """
+def get_stats(request: Request, db: Session = Depends(get_db)):
+    """Returns HTML stats page with request breakdown table."""
     total_requests = db.query(RequestLog).count()
-
-    avg_response_time = db.query(func.avg(RequestLog.response_time_ms)).scalar() or 0
-
+    avg_response_time = round(
+        db.query(func.avg(RequestLog.response_time_ms)).scalar() or 0, 2
+    )
     by_path = (
-        db.query(RequestLog.path, func.count(RequestLog.id).label("count"))
+        db.query(RequestLog.path, func.count(RequestLog.id).label('count'))
         .group_by(RequestLog.path)
         .order_by(func.count(RequestLog.id).desc())
         .all()
     )
+    endpoints = [
+        {
+            'path': p,
+            'count': c,
+            'percent': round((c / total_requests * 100) if total_requests > 0 else 0)
+        }
+        for p, c in by_path
+    ]
+    return templates.TemplateResponse(
+        name='stats.html', request=request,
+        context={
+            'total_requests': total_requests,
+            'avg_response_time': avg_response_time,
+            'endpoint_count': len(endpoints),
+            'endpoints': endpoints,
+        }
+    )
 
-    return {
-        'total_requests': total_requests,
-        'avg_response_time_ms': round(avg_response_time, 2),
-        'requests_by_endpoint': [{'path': p, 'count': c} for p, c in by_path],
-    }
+
+@app.get('/dashboard')
+def dashboard():
+    """Redirects to the Grafana Cloud dashboard."""
+    return RedirectResponse(url='https://your-grafana-dashboard-url')

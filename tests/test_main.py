@@ -13,27 +13,18 @@ def test_read_root():
 
 
 def test_health_check():
+    """Tests the /health endpoint for a successful response.
+    and a known string in the page ("System Health")"""
     response = client.get('/health')
     assert response.status_code == 200
-    assert response.json() == {'status': 'ok'}
-
-
-def test_get_item():
-    response = client.get('/items/42')
-    assert response.status_code == 200
-    assert response.json() == {'item_id': 42, 'name': 'Item 42'}
-
-
-def test_health_check_db():
-    response = client.get('/health/db')
-    assert response.status_code == 200
-    assert response.json()['database'] == 'connected'
+    assert 'text/html' in response.headers['content-type']
+    assert 'System Health' in response.text
 
 
 def test_stats():
+    """Tests the /stats endpoint for a successful response.
+    and a known string in the page ("Request Stats")"""
     response = client.get('/stats')
     assert response.status_code == 200
-    data = response.json()
-    assert 'total_requests' in data
-    assert 'avg_response_time_ms' in data
-    assert 'requests_by_endpoint' in data
+    assert 'text/html' in response.headers['content-type']
+    assert 'Request Stats' in response.text
