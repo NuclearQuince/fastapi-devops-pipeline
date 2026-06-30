@@ -62,8 +62,8 @@ def read_root(request: Request):
 
 
 @app.get('/health')
-def health_check(request: Request, db: Session = Depends(get_db)):
-    """Returns HTML health status page for all system components."""
+def health_check(db: Session = Depends(get_db)):
+    """Returns JSON health status for all system components."""
     try:
         db.execute(func.now())
         db_status = 'connected'
@@ -72,29 +72,31 @@ def health_check(request: Request, db: Session = Depends(get_db)):
 
     total_requests = db.query(RequestLog).count()
 
-    return templates.TemplateResponse(
-        name='health.html', request=request,
-        context={
-            'app_status': 'ok',
-            'db_status': db_status,
-            'total_requests': total_requests,
-        }
-    )
+    return {
+        'app_status': 'ok',
+        'db_status': db_status,
+        'total_requests': total_requests,
+        'metrics': 'exposed at /metrics',
+        'ci_cd': 'active',
+    }
 
 
 @app.get('/stats')
-def get_stats(request: Request, db: Session = Depends(get_db)):
-    """Returns HTML stats page with request breakdown table."""
+def get_stats(db: Session = Depends(get_db)):
+    """Returns JSON aggregate statistics from all logged requests."""
     total_requests = db.query(RequestLog).count()
+
     avg_response_time = round(
         db.query(func.avg(RequestLog.response_time_ms)).scalar() or 0, 2
     )
+
     by_path = (
         db.query(RequestLog.path, func.count(RequestLog.id).label('count'))
         .group_by(RequestLog.path)
         .order_by(func.count(RequestLog.id).desc())
         .all()
     )
+
     endpoints = [
         {
             'path': p,
@@ -103,15 +105,13 @@ def get_stats(request: Request, db: Session = Depends(get_db)):
         }
         for p, c in by_path
     ]
-    return templates.TemplateResponse(
-        name='stats.html', request=request,
-        context={
-            'total_requests': total_requests,
-            'avg_response_time': avg_response_time,
-            'endpoint_count': len(endpoints),
-            'endpoints': endpoints,
-        }
-    )
+
+    return {
+        'total_requests': total_requests,
+        'avg_response_time_ms': avg_response_time,
+        'endpoint_count': len(endpoints),
+        'requests_by_endpoint': endpoints,
+    }
 
 
 @app.get('/dashboard')
