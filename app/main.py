@@ -116,5 +116,7 @@ def get_stats(db: Session = Depends(get_db)):
 
 @app.get('/dashboard')
 def dashboard():
-    """Redirects to the Grafana Cloud dashboard."""
-    return RedirectResponse(url='https://your-grafana-dashboard-url')
+    """Redirects to the public Grafana dashboard snapshot."""
+    return RedirectResponse(
+        url='https://dashingorchid2928.grafana.net/dashboard/snapshot/ghmC5KILVxGDx3ICo3hKlFszyhC0dZBZ'  # noqa: E501
+    )
