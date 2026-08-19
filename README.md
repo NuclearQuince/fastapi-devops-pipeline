@@ -3,7 +3,9 @@
 A production-grade Python API demonstrating end-to-end DevOps practices — CI/CD, containerisation, cloud deployment, and live observability. Every component is built and maintained using industry-standard tooling and workflows.
 
 **🌐 Live URL:** https://fastapi-devops-pipeline.onrender.com
+
 **📊 Grafana Dashboard:** https://dashingorchid2928.grafana.net/dashboard/snapshot/ghmC5KILVxGDx3ICo3hKlFszyhC0dZBZ
+
 **💻 GitHub:** https://github.com/NuclearQuince/fastapi-devops-pipeline
 
 ---
